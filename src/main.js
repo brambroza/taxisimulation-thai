@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import {loadAsokMap,project,PLACES} from './osm.js';
 const root=document.querySelector('#app');
-root.innerHTML='<div id="hud"><b>🚕 BANGKOK DRIVE 3D</b><div id="speed">0 km/h</div><div id="navigation">เลือกจุดหมายเพื่อเริ่มนำทาง</div><div id="map-status">รอโหลด OSM</div><a href="/merchant.html" class="merchant-link">🏪 Merchant Portal</a><div id="cash">฿0</div><select id="destination"><option value="0">อโศก / Asok</option><option value="1">Terminal 21</option><option value="2">สวนเบญจสิริ</option><option value="3">พร้อมพงษ์</option></select><button id="mission">เริ่มภารกิจ</button><p id="status">ขับรถเที่ยวกรุงเทพฯ</p></div><div id="controls"><button data-key="left">◀</button><button data-key="right">▶</button><button data-key="brake">เบรก</button><button data-key="gas">เร่ง ▲</button></div><div id="tools"><button id="camera">📷 กล้อง</button><button id="reset">↻ รีเซ็ต</button></div><div id="credit">OpenStreetMap roads & footprints · buildings approximate · not live Street View</div>';
+root.innerHTML='<div id="hud"><b>🚕 BANGKOK DRIVE 3D</b><div id="speed">0 km/h</div><div id="navigation">เลือกจุดหมายเพื่อเริ่มนำทาง</div><div id="map-status">รอโหลด OSM</div><a href="/merchant.html" class="merchant-link">🏪 Merchant Portal</a><div id="cash">฿0</div><select id="destination"><option value="0">อโศก / Asok</option><option value="1">Terminal 21</option><option value="2">สวนเบญจสิริ</option><option value="3">พร้อมพงษ์</option></select><button id="mission">เริ่มภารกิจ</button><p id="status">ขับรถเที่ยวกรุงเทพฯ</p></div><div id="controls"><button data-key="left">◀</button><button data-key="right">▶</button><button data-key="brake">เบรก</button><button data-key="gas">เร่ง ▲</button></div><div id="tools"><button id="camera">📷 กล้อง</button><button id="reset">↻ รีเซ็ต</button></div><div id="credit">© OpenStreetMap contributors · buildings approximate · not live Street View</div>';
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x98c5e5);scene.fog=new THREE.Fog(0x98c5e5,160,650);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);document.body.prepend(renderer.domElement);
 const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.1,1400);
@@ -50,6 +50,21 @@ cabinBox(.53,.17,.08,0,2.05,-1.74,material(0x8eb7cb));
 for(const x of [-1.25,1.25])cabinBox(.37,.19,.12,x,1.34,-1.7,material(0x8eb7cb));
 const cockpitEye=new THREE.Vector3(-.48,1.78,.30);
 const cockpitTarget=new THREE.Vector3(-.48,1.70,-17);
+// Merchant pins from the local prototype portal (same-origin localStorage).
+const merchantPins=new THREE.Group();scene.add(merchantPins);
+function refreshMerchantPins(){
+  merchantPins.clear();
+  let shops=[];try{shops=JSON.parse(localStorage.getItem('bkk-digital-twin-merchants-v1')||'[]')}catch{}
+  for(const shop of shops.slice(0,100)){
+    if(!Number.isFinite(shop.lat)||!Number.isFinite(shop.lon))continue;
+    const p=project(shop.lat,shop.lon);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,6,8),material(0xf0c949));
+    pole.position.set(p.x,3,p.z);merchantPins.add(pole);
+    const label=signText([String(shop.name||'ร้านค้า').slice(0,22)],6.5,2);
+    label.position.set(p.x,7,p.z);merchantPins.add(label);
+  }
+}
+refreshMerchantPins();addEventListener('storage',refreshMerchantPins);
 const goals=PLACES.map(p=>project(p.lat,p.lon));const marker=new THREE.Mesh(new THREE.CylinderGeometry(4,4,.15,24),new THREE.MeshBasicMaterial({color:0x31f7a7}));marker.position.y=.15;marker.visible=false;scene.add(marker);
 let speed=0,heading=0,mode=0,goal=null,money=0;const keys={gas:false,brake:false,left:false,right:false};const $=id=>document.getElementById(id);
 $('mission').onclick=()=>{goal=goals[Number($('destination').value)].clone();marker.position.x=goal.x;marker.position.z=goal.z;marker.visible=true;$('status').textContent='ขับไปยังหมุดสีเขียว'};
