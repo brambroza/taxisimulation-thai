@@ -66,7 +66,7 @@ function refreshMerchantPins(){
     // It is a geolocated photo panel, NOT a reconstructed building facade.
     if(typeof shop.image==='string'&&/^https:\/\//i.test(shop.image)){
       const photo=new THREE.Mesh(new THREE.PlaneGeometry(8,4.5),new THREE.MeshBasicMaterial({color:0x55606b,side:THREE.DoubleSide}));
-      photo.position.set(p.x,9,p.z);merchantPins.add(photo);
+      photo.position.set(p.x,9,p.z);photo.rotation.y=THREE.MathUtils.degToRad(Number(shop.facing)||0);merchantPins.add(photo);
       loader.load(shop.image,texture=>{
         if(!photo.parent){texture.dispose();return}
         texture.colorSpace=THREE.SRGBColorSpace;
