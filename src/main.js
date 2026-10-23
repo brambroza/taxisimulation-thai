@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import {loadAsokMap,project,PLACES} from './osm.js';
 const root=document.querySelector('#app');
-root.innerHTML='<div id="hud"><b>🚕 BANGKOK DRIVE 3D</b><div id="speed">0 km/h</div><div id="navigation">เลือกจุดหมายเพื่อเริ่มนำทาง</div><div id="map-status">รอโหลด OSM</div><a href="/merchant.html" class="merchant-link">🏪 Merchant Portal</a><div id="cash">฿0</div><select id="destination"><option value="0">อโศก / Asok</option><option value="1">Terminal 21</option><option value="2">สวนเบญจสิริ</option><option value="3">พร้อมพงษ์</option></select><button id="mission">เริ่มภารกิจ</button><p id="status">ขับรถเที่ยวกรุงเทพฯ</p></div><div id="controls"><button data-key="left">◀</button><button data-key="right">▶</button><button data-key="brake">เบรก</button><button data-key="gas">เร่ง ▲</button></div><div id="tools"><button id="camera">📷 กล้อง</button><button id="reset">↻ รีเซ็ต</button></div><div id="credit">© OpenStreetMap contributors · buildings approximate · not live Street View</div>';
+root.innerHTML='<div id="hud"><b>🚕 BANGKOK DRIVE 3D</b><div id="speed">0 km/h</div><div id="navigation">เลือกจุดหมายเพื่อเริ่มนำทาง</div><div id="map-status">รอโหลด OSM</div><a href="/merchant.html" class="merchant-link">🏪 Merchant Portal</a><div id="cash">฿0</div><select id="destination"><option value="0">อโศก / Asok</option><option value="1">Terminal 21</option><option value="2">สวนเบญจสิริ</option><option value="3">พร้อมพงษ์</option></select><button id="mission">เริ่มภารกิจ</button><p id="status">ขับรถเที่ยวกรุงเทพฯ</p></div><div id="controls"><button data-key="left">◀</button><button data-key="right">▶</button><button data-key="brake">เบรก</button><button data-key="gas">เร่ง ▲</button></div><div id="tools"><button id="camera">📷 กล้อง</button><button id="reset">↻ รีเซ็ต</button></div><div id="credit">© OpenStreetMap contributors · OSM POIs may be outdated · geometry not photorealistic</div>';
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x98c5e5);scene.fog=new THREE.Fog(0x98c5e5,160,650);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);document.body.prepend(renderer.domElement);
 const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.1,1400);
@@ -27,10 +27,7 @@ function signText(lines, width=9, height=3.4) {
   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
   return new THREE.Mesh(new THREE.PlaneGeometry(width,height),new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide}));
 }
-for(const [x,z,name] of [[0,-100,'ASOK  อโศก'],[180,-210,'SUKHUMVIT  สุขุมวิท'],[440,50,'PHROM PHONG  พร้อมพงษ์']]){
-  const sign=signText([name,'↑  STRAIGHT AHEAD']);sign.position.set(x,6,z);scene.add(sign);
-  for(const dx of [-3.6,3.6]){const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,6,8),material(0x8c9a9e));pole.position.set(x+dx,3,z);scene.add(pole)}
-}
+// No invented road-sign locations: real signs require surveyed/georeferenced assets.
 // Interior parts are attached to the car so they move and turn with it.
 const interior=new THREE.Group();car.add(interior);
 const trim=material(0x1b242d),dash=material(0x242c34),glass=new THREE.MeshStandardMaterial({color:0x80b4d1,transparent:true,opacity:.16,roughness:.13,metalness:.12,depthWrite:false});
