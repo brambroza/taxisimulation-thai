@@ -62,6 +62,7 @@ let last=performance.now();
 function frame(t){const dt=Math.min((t-last)/1000,.05);last=t;
 speed+=((keys.gas?13:0)-(keys.brake?24:0))*dt;speed*=Math.pow((keys.gas || keys.brake) ? 0.999 : 0.982,dt*60);speed=THREE.MathUtils.clamp(speed,-7,30);
 heading+=(Number(keys.left)-Number(keys.right))*dt*speed*.035;car.rotation.y=heading;car.position.x-=Math.sin(heading)*speed*dt;car.position.z-=Math.cos(heading)*speed*dt;
+cab.visible=mode!==0;
 wheel.rotation.z=THREE.MathUtils.lerp(wheel.rotation.z,(Number(keys.right)-Number(keys.left))*.55,Math.min(1,dt*8));
 if(mode===0){ // driver's eyes inside the cabin, facing forward
   camera.position.copy(car.localToWorld(cockpitEye.clone()));
