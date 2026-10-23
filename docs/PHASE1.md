@@ -40,3 +40,11 @@ npm run dev
 npm run build
 
 Cloudflare Pages: React (Vite) preset, build command `npm run build`, output `dist`.
+
+## Browser realism track (started)
+- Merchants may supply a licensed HTTPS storefront photo and orientation in the portal.
+- The driving scene now renders that photo on a georeferenced vertical panel, rather than pretending an automatically generated facade is the actual shop.
+- This is a visual content pipeline proof of concept; it is **not** photogrammetry, a textured building mesh, or a verified street-level reconstruction.
+- For a realistic district, obtain licensed reference imagery, model building facades, street furniture, sidewalks, traffic assets, and align each asset to surveyed locations.
+- Acceptance target for the first 200–300 m: 10 verified storefront facades, recognizable landmark models, consistent road/sidewalk geometry, measured FPS on mobile/desktop, and continuous first-person driving.
+- Do not scrape Google Street View, Google Maps, or third-party photographs. Obtain explicit commercial use rights and verify CORS for merchant image URLs.
