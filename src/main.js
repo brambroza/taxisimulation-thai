@@ -50,15 +50,30 @@ const cockpitTarget=new THREE.Vector3(-.48,1.70,-17);
 // Merchant pins from the local prototype portal (same-origin localStorage).
 const merchantPins=new THREE.Group();scene.add(merchantPins);
 function refreshMerchantPins(){
+  // Remove and dispose of previous merchant media to avoid GPU memory leaks.
+  merchantPins.traverse(obj=>{if(obj.geometry)obj.geometry.dispose();if(obj.material){const mats=Array.isArray(obj.material)?obj.material:[obj.material];mats.forEach(m=>{m.map?.dispose();m.dispose()})}});
   merchantPins.clear();
   let shops=[];try{shops=JSON.parse(localStorage.getItem('bkk-digital-twin-merchants-v1')||'[]')}catch{}
-  for(const shop of shops.slice(0,100)){
+  const loader=new THREE.TextureLoader();
+  for(const shop of shops.slice(0,60)){
     if(!Number.isFinite(shop.lat)||!Number.isFinite(shop.lon))continue;
     const p=project(shop.lat,shop.lon);
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,6,8),material(0xf0c949));
-    pole.position.set(p.x,3,p.z);merchantPins.add(pole);
-    const label=signText([String(shop.name||'ร้านค้า').slice(0,22)],6.5,2);
-    label.position.set(p.x,7,p.z);merchantPins.add(label);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,4.5,8),material(0x67757b));
+    pole.position.set(p.x,2.25,p.z);merchantPins.add(pole);
+    const label=signText([String(shop.name||'ร้านค้า').slice(0,22)],7,2);
+    label.position.set(p.x,5.5,p.z);merchantPins.add(label);
+    // A merchant-provided, licensed facade photograph is shown in the world.
+    // It is a geolocated photo panel, NOT a reconstructed building facade.
+    if(typeof shop.image==='string'&&/^https:\/\//i.test(shop.image)){
+      const photo=new THREE.Mesh(new THREE.PlaneGeometry(8,4.5),new THREE.MeshBasicMaterial({color:0x55606b,side:THREE.DoubleSide}));
+      photo.position.set(p.x,9,p.z);merchantPins.add(photo);
+      loader.load(shop.image,texture=>{
+        if(!photo.parent){texture.dispose();return}
+        texture.colorSpace=THREE.SRGBColorSpace;
+        photo.material.dispose();
+        photo.material=new THREE.MeshBasicMaterial({map:texture,side:THREE.DoubleSide});
+      },undefined,()=>console.warn('Merchant image could not be loaded:',shop.image));
+    }
   }
 }
 refreshMerchantPins();addEventListener('storage',refreshMerchantPins);
