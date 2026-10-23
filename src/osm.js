@@ -17,13 +17,10 @@ const roadMaterial=mat(0x3c4147),buildingMaterials=[mat(0xb2aaa0),mat(0x9ba7ad),
 function roadSegment(a,b,width,group){
   const length=a.distanceTo(b);if(length<.4)return;
   const mesh=new THREE.Mesh(new THREE.PlaneGeometry(width,length),roadMaterial);
-  mesh.rotation.x=-Math.PI/2;
-  mesh.rotation.z=0;
   mesh.position.copy(a).add(b).multiplyScalar(.5);mesh.position.y=.055;
-  mesh.rotation.y=-Math.atan2(b.x-a.x,-(b.z-a.z));
-  // Rotate in horizontal plane with a world-space quaternion.
-  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),new THREE.Vector3((b.x-a.x)/length,0,(b.z-a.z)/length));
-  mesh.rotateX(-Math.PI/2); // plane normal -> up
+  const base=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);
+  const turn=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),-Math.atan2(b.x-a.x,-(b.z-a.z)));
+  mesh.quaternion.copy(turn.multiply(base));
   group.add(mesh);
 }
 function building(nodes,way,group){
