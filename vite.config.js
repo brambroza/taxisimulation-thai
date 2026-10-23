@@ -1,3 +1,5 @@
 import {defineConfig} from 'vite';
-import {resolve} from 'node:path';
-export default defineConfig({build:{rollupOptions:{input:{main:resolve(import.meta.dirname,'index.html'),merchant:resolve(import.meta.dirname,'merchant.html')}}}});
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url));
+export default defineConfig({build:{rollupOptions:{input:{main:resolve(root,'index.html'),merchant:resolve(root,'merchant.html')}}}});
